@@ -4,6 +4,8 @@ import Library.Tactic.Numbers
 import Library.Tactic.Addarith
 import Library.Tactic.Cancel
 
+axiom notnotE {p : Prop} (h : ¬ ¬ p) : p
+
 -- Question 3 a
 -- example {p q r : Prop} (h : p → (q → r)) : p ∧ q → r := by
 -- intro h_pq
@@ -11,24 +13,33 @@ import Library.Tactic.Cancel
 -- have h_qr : q → r := by apply h h_p
 -- apply h_qr h_q
 -- Question 3 a
-example {p q r: Prop} (h : p ∧ q → r) : p → (q → r) := by
+theorem Problem3a {p q r: Prop} (h : p ∧ q → r) : p → (q → r) := by
 intro h_p
 intro h_q
 have h_pq : p ∧ q := by apply And.intro h_p h_q
 apply h h_pq
 -- Question 3 b
-example {p q r: Prop} (h : p → (q → r)): (p →q) → (p → r) := by
+theorem Problem3b {p q r: Prop} (h : p → (q → r)): (p →q) → (p → r) := by
 intro h_pq
 intro h_p
 have h_q : q := by apply h_pq h_p
 have h_qr: q → r := by apply h h_p
 apply h_qr h_q
+
 -- Question 3 c
-example {p q r: Prop} (h1 : p ∧ ¬q → r) (h2: ¬r) (h3 : p) : ¬(¬q):= by
-intro h_q
-have h_pq : p ∧ ¬q := by apply And.intro h3 h_q
-have h_r : r := by apply h1 h_pq
-contradiction
+theorem Problem3c {p q r: Prop} (h1 : p ∧ ¬q → r) (h2: ¬r) (h3 : p) : q:= by
+have h_notnotq : ¬¬q := by 
+  intro not_q 
+  have h_pq : p ∧ ¬q := by apply And.intro h3 not_q
+  have h_r : r := by apply h1 h_pq
+  contradiction
+apply notnotE h_notnotq
+-- intro h_q
+-- have h_pq : p ∧ ¬q := by apply And.intro h3 h_q
+-- have h_r : r := by apply h1 h_pq
+-- contradiction
+
+
 -- Question 4 a
 example {a b : ℤ} (h1 : a = 2 * b + 5) (h2 : b = 3) : a = 11 := 
 calc
