@@ -10,7 +10,7 @@ import Library.Tactic.Addarith
 import Library.Tactic.Cancel
 import Library.Tactic.Use
 
-
+notation3 (prettyPrint := false) "forall_sufficiently_large "(...)", "r:(scoped P => ∃ C, ∀ x ≥ C, P x) => r
 
 example {n : ℤ} (hn : Odd n) : Odd (7 * n - 4) := by
   dsimp[Odd] at *
@@ -38,9 +38,67 @@ example {n : ℤ} (hn : Even n) : Odd (n ^ 2 + 2 * n - 5) := by
     _ = 4*k^2 + 4 * k - 5 := by ring
     _ = 2 * (2*k^2 + 2 * k - 3) + 1 := by ring
 
--- example (a b c : ℤ) : Even (a - b) ∨ Even (a + c) ∨ Even (b - c) := by
---   dsimp[Even] at *
---   obtain hx|hx|hx := sprry
+example (a b c : ℤ) : Even (a - b) ∨ Even (a + c) ∨ Even (b - c) := by
+  obtain hae | hao := Int.even_or_odd a
+  . obtain hbe | hbo := Int.even_or_odd b
+    . obtain ⟨ x,hx⟩ := hae
+      obtain ⟨ y,hy⟩ := hbe
+      have h1 : Even (a - b ) := by
+        use x - y 
+        calc
+          a - b = 2*x - 2*y := by rw[hx,hy]
+          _ = 2 * (x - y) := by ring
+          _ = x - y + (x - y) := by ring
+      apply Or.intro_left h1 
+    . obtain hce | hco := Int.even_or_odd c
+      . obtain ⟨ x,hx⟩ := hae
+        obtain ⟨ y,hy⟩ := hce
+        have h1 : Even (a + c ) := by
+          use x + y 
+          calc
+            a + c = 2*x + 2*y := by rw[hx,hy]
+            _ = 2 * (x + y) := by ring
+            _ = x + y + (x + y) := by ring
+        apply sorry
+      . obtain ⟨ x,hx⟩ := hbo
+        obtain ⟨ y,hy⟩ := hco
+        have h1 : Even (b - c ) := by
+          use x - y 
+          calc
+            b - c = 2*x + 1 - (2*y + 1) := by rw[hx,hy]
+            _ = 2 * (x - y) := by ring
+            _ = x - y + (x - y) := by ring
+        apply sorry
+  . obtain hbe | hbo := Int.even_or_odd b
+    . obtain hce | hco := Int.even_or_odd c
+      . obtain ⟨ x,hx⟩ := hbe
+        obtain ⟨ y,hy⟩ := hce
+        have h1 : Even (b - c ) := by
+          use x - y 
+          calc
+            b - c = 2*x - 2*y := by rw[hx,hy]
+            _ = 2 * (x - y) := by ring
+            _ = x - y + (x - y) := by ring
+        apply sorry
+      . obtain ⟨ x,hx⟩ := hao
+        obtain ⟨ y,hy⟩ := hco
+        have h1 : Even (a + c ) := by
+          use x + y + 1
+          calc
+            a + c = 2*x + 1 + (2*y + 1) := by rw[hx,hy]
+            _ = 2 * (x + y + 1) := by ring
+            _ = (x + y + 1) + (x + y + 1) := by ring
+        apply sorry  
+    . obtain ⟨ x,hx⟩ := hao
+      obtain ⟨ y,hy⟩ := hbo
+      have h1 : Even (a - b ) := by
+        use x - y 
+        calc
+          a - b = 2*x + 1 - (2*y + 1) := by rw[hx,hy]
+          _ = 2 * (x - y) := by ring
+          _ = x - y + (x - y) := by ring
+      apply sorry
+
 
 example {a b : ℝ} (h : ∀ x, x ≥ a ∨ x ≤ b) : a ≤ b := by
   have h1 : (a + b)/2 ≥ a ∨ (a + b)/2 ≤ b := by apply h
@@ -69,13 +127,54 @@ example : ∃ c : ℝ, ∀ x y , x ^ 2 + y ^ 2 ≤ 4 → x + y ≥ c := by
   apply hx
 
 example {n : ℤ} (hn : ∀ m, 1 ≤ m → m ≤ 5 → m ∣ n) : 15 ∣ n := by
-  
+  have h3 : 1 ≤ 3 → 3 ≤ 5 → 3 ∣ n := hn 3
+  simp at h3
+  have h5 : 1 ≤ 5 → 5 ≤ 5 → 5 ∣ n := hn 5
+  simp at h5
+  obtain ⟨x, hx⟩ := h3
+  obtain ⟨y, hy⟩ := h5
+  dsimp [(· ∣ ·)]
+  use 2*x - 3 * y
+  calc
+    n = 10*n - 9*n := by ring
+    _ = 10 * (3*x) - 9*n := by rw[hx]
+    _ = 10 * (3*x) - 9*(5*y) := by rw[hy]
+    _ = 30*x - 45 * y := by ring
+    _ = 15 * (2*x - 3 * y) := by ring
+
+
+
 
 example : forall_sufficiently_large x : ℝ, x ^ 3 + 3 * x ≥ 7 * x ^ 2 + 12 := by
-  sorry
+  dsimp
+  use 7
+  intro x hx
+  calc 
+    x^3 + 3* x = x * x^2 + 3 * x := by ring
+    _ ≥ 7 * x^2 + 3 * x := by rel[hx]
+    _ ≥ 7 * x^2 + 3 * 7 := by rel[hx]
+    _ = 7 * x^2 + 21 := by ring
+    _ = 7 * x ^ 2 + 12 + 9:= by ring
+    _ ≥ 7 * x ^ 2 + 12 := by extra
+
+
+
 
 example {x : ℝ} : x ^ 2 + x - 6 = 0 ↔ x = -3 ∨ x = 2 := by
-  sorry
+  constructor
+  . intro h1
+    have h2 : (x+3)*(x - 2) = 0 := by
+      calc
+        x ^ 2 + x - 6 = (x+3)*(x - 2) := by ring
+    
+  . intro h2
+    obtain hx | hx := h2
+    . calc
+        x^2 + x - 6 = (-3)^2 + - 3 - 6 := by rw[hx]
+        _ = 0 := by ring 
+    . calc
+        x^2 + x - 6 = (2)^2 + 2 - 6 := by rw[hx]
+        _ = 0 := by ring 
 
 example {a : ℤ} : a ^ 2 - 5 * a + 5 ≤ -1 ↔ a = 2 ∨ a = 3 := by
   sorry
