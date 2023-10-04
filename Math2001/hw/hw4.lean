@@ -41,7 +41,8 @@ example {n : ℤ} (hn : Even n) : Odd (n ^ 2 + 2 * n - 5) := by
 example (a b c : ℤ) : Even (a - b) ∨ Even (a + c) ∨ Even (b - c) := by
   obtain hae | hao := Int.even_or_odd a
   . obtain hbe | hbo := Int.even_or_odd b
-    . obtain ⟨ x,hx⟩ := hae
+    . left
+      obtain ⟨ x,hx⟩ := hae
       obtain ⟨ y,hy⟩ := hbe
       have h1 : Even (a - b ) := by
         use x - y 
@@ -49,9 +50,11 @@ example (a b c : ℤ) : Even (a - b) ∨ Even (a + c) ∨ Even (b - c) := by
           a - b = 2*x - 2*y := by rw[hx,hy]
           _ = 2 * (x - y) := by ring
           _ = x - y + (x - y) := by ring
-      apply Or.intro_left h1 
+      apply h1
     . obtain hce | hco := Int.even_or_odd c
-      . obtain ⟨ x,hx⟩ := hae
+      . right
+        left
+        obtain ⟨ x,hx⟩ := hae
         obtain ⟨ y,hy⟩ := hce
         have h1 : Even (a + c ) := by
           use x + y 
@@ -59,45 +62,52 @@ example (a b c : ℤ) : Even (a - b) ∨ Even (a + c) ∨ Even (b - c) := by
             a + c = 2*x + 2*y := by rw[hx,hy]
             _ = 2 * (x + y) := by ring
             _ = x + y + (x + y) := by ring
-        apply sorry
+        apply h1
       . obtain ⟨ x,hx⟩ := hbo
         obtain ⟨ y,hy⟩ := hco
+        right
+        right
         have h1 : Even (b - c ) := by
           use x - y 
           calc
             b - c = 2*x + 1 - (2*y + 1) := by rw[hx,hy]
             _ = 2 * (x - y) := by ring
             _ = x - y + (x - y) := by ring
-        apply sorry
+        apply h1
   . obtain hbe | hbo := Int.even_or_odd b
     . obtain hce | hco := Int.even_or_odd c
       . obtain ⟨ x,hx⟩ := hbe
-        obtain ⟨ y,hy⟩ := hce
+        obtain ⟨ y,hy⟩ := hce 
+        right 
+        right
         have h1 : Even (b - c ) := by
           use x - y 
           calc
             b - c = 2*x - 2*y := by rw[hx,hy]
             _ = 2 * (x - y) := by ring
             _ = x - y + (x - y) := by ring
-        apply sorry
+        apply h1
       . obtain ⟨ x,hx⟩ := hao
         obtain ⟨ y,hy⟩ := hco
+        right 
+        left
         have h1 : Even (a + c ) := by
           use x + y + 1
           calc
             a + c = 2*x + 1 + (2*y + 1) := by rw[hx,hy]
             _ = 2 * (x + y + 1) := by ring
             _ = (x + y + 1) + (x + y + 1) := by ring
-        apply sorry  
+        apply h1  
     . obtain ⟨ x,hx⟩ := hao
       obtain ⟨ y,hy⟩ := hbo
+      left
       have h1 : Even (a - b ) := by
         use x - y 
         calc
           a - b = 2*x + 1 - (2*y + 1) := by rw[hx,hy]
           _ = 2 * (x - y) := by ring
           _ = x - y + (x - y) := by ring
-      apply sorry
+      apply h1
 
 
 example {a b : ℝ} (h : ∀ x, x ≥ a ∨ x ≤ b) : a ≤ b := by
@@ -165,8 +175,25 @@ example {x : ℝ} : x ^ 2 + x - 6 = 0 ↔ x = -3 ∨ x = 2 := by
   . intro h1
     have h2 : (x+3)*(x - 2) = 0 := by
       calc
-        x ^ 2 + x - 6 = (x+3)*(x - 2) := by ring
-    
+        (x + 3)*(x - 2) = x^2 + 3*x - 2*x - 6 := by ring
+        _ =  x ^ 2 + x - 6 := by ring
+        _ = 0 := by rw[h1]
+    have h3 : x + 3 = 0 ∨ x - 2 = 0 := by apply eq_zero_or_eq_zero_of_mul_eq_zero h2
+    obtain h4 | h5 := h3
+    . left
+      have h6 : x = -3 := by
+        calc
+          x = x + 3 - 3 := by ring
+          _ = 0 - 3:= by rw[h4]
+          _ = -3 := by ring 
+      apply h6
+    . right
+      have h6 : x = 2 := by
+        calc
+          x = x -2 +2 := by ring
+          _ = 0 + 2:= by rw[h5]
+          _ = 2 := by ring 
+      apply h6
   . intro h2
     obtain hx | hx := h2
     . calc
@@ -177,4 +204,31 @@ example {x : ℝ} : x ^ 2 + x - 6 = 0 ↔ x = -3 ∨ x = 2 := by
         _ = 0 := by ring 
 
 example {a : ℤ} : a ^ 2 - 5 * a + 5 ≤ -1 ↔ a = 2 ∨ a = 3 := by
-  sorry
+  constructor
+  . intro h1
+    have hu : 0 ≤1  := by ring
+    have h3 : -1 ≤ 2*a - 5 ∧ 2* a - 5 ≤ 1
+    . apply abs_le_of_sq_le_sq' 
+      calc
+        (2*a - 5)^2 = 4*(a^2 - 5*a + 5) + 5 := by ring
+        _ ≤ 4 * - 1 + 5 := by rel[h1]
+        _ = 1^2 := by ring
+      numbers
+    obtain ⟨ hx,hy ⟩ := h3
+    have h4 : 2 * a ≥ 4:= by
+      calc 
+        2 * a = 2 * a - 5 + 5 := by ring 
+        _ ≥ (-1 + 5):= by rel[hx]
+        _ = 4:= by ring
+    have h5 : a ≥ 2 := by 
+      calc
+        a = (2 * a) / 2 := by aesop
+        _ ≥ (4) / 2 := by rel[h4]
+        _ = 2 := by ring 
+
+    interval_cases a
+    . left
+      numbers
+    . right
+      numbers
+  . intro h1
