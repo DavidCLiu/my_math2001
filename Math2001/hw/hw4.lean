@@ -215,20 +215,31 @@ example {a : ℤ} : a ^ 2 - 5 * a + 5 ≤ -1 ↔ a = 2 ∨ a = 3 := by
         _ = 1^2 := by ring
       numbers
     obtain ⟨ hx,hy ⟩ := h3
-    have h4 : 2 * a ≥ 4:= by
+    have h4 : 2*a≥2*2  := by
       calc 
-        2 * a = 2 * a - 5 + 5 := by ring 
-        _ ≥ (-1 + 5):= by rel[hx]
+        2*a  =  2*a - 5 + 5:= by ring 
+        _ ≥ (-1) + 5 := by rel[hx]
         _ = 4:= by ring
-    have h5 : a ≥ 2 := by 
-      calc
-        a = (2 * a) / 2 := by aesop
-        _ ≥ (4) / 2 := by rel[h4]
-        _ = 2 := by ring 
-
+    cancel 2 at h4
+    have h5 : 2*a≤ 2*3  := by
+      calc 
+        2*a  =  2*a - 5 + 5:= by ring 
+        _ ≤ (1) + 5 := by rel[hy]
+        _ = 6:= by ring
+    cancel 2 at h5
     interval_cases a
     . left
       numbers
     . right
       numbers
-  . intro h1
+  . intro h1 
+    obtain hxt | hyt := h1
+    . 
+      calc
+        a^2 - 5*a + 5 = 2^2 - 5*2 + 5 := by rw[hxt]
+        _ ≤ -1 := by ring 
+    . 
+      calc
+        a^2 - 5*a + 5 = 3^2 - 5*3 + 5 := by rw[hyt]
+        _ ≤ -1 := by ring 
+
