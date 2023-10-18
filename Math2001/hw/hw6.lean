@@ -20,7 +20,7 @@ theorem superpowered_one : Superpowered 1 := by
   conv => ring -- simplifies goal from `Prime (1 ^ 1 ^ n + 1)` to `Prime 2`
   apply prime_two
 
-
+-- Problem 4 a
 example {P Q : α → Prop} (h : ∀ x, P x ↔ Q x) : (∃ x, P x) ↔ (∃ x, Q x) := by
   constructor
   . intro h1
@@ -38,7 +38,7 @@ example {P Q : α → Prop} (h : ∀ x, P x ↔ Q x) : (∃ x, P x) ↔ (∃ x, 
     have h6 : P x := by apply h5 h2
     apply h6
     
-
+-- Problem 4 b
 example (P : α → β → Prop) : (∃ x y, P x y) ↔ ∃ y x, P x y := by
   constructor
   . intro h
@@ -52,6 +52,9 @@ example (P : α → β → Prop) : (∃ x y, P x y) ↔ ∃ y x, P x y := by
     use y
     apply h1
 
+
+-- Problem 4 c
+
 example (P : α → β → Prop) : (∀ x y, P x y) ↔ ∀ y x, P x y := by
   constructor 
   . intro h1
@@ -62,6 +65,8 @@ example (P : α → β → Prop) : (∀ x y, P x y) ↔ ∀ y x, P x y := by
     intro y
     intro x
     apply h1
+
+-- Problem 4 d
 
 example (P : α → Prop) (Q : Prop) : ((∃ x, P x) ∧ Q) ↔ ∃ x, (P x ∧ Q) := by
   constructor
@@ -78,6 +83,8 @@ example (P : α → Prop) (Q : Prop) : ((∃ x, P x) ∧ Q) ↔ ∃ x, (P x ∧ 
       apply hp
     . apply hq
 
+
+-- Problem 5 a
 example : ∃ x : ℝ, Tribalanced x ∧ ¬ Tribalanced (x + 1) := by
   by_cases h2 : Tribalanced 1
   . use 1
@@ -96,7 +103,7 @@ example : ∃ x : ℝ, Tribalanced x ∧ ¬ Tribalanced (x + 1) := by
       apply h2
 
     
-
+-- Problem 5 b
 example : ∃ k : ℕ, Superpowered k ∧ ¬ Superpowered (k + 1) := by
   use 1
   have h1 : Superpowered 1 := by apply superpowered_one
