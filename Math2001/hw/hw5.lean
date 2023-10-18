@@ -10,6 +10,7 @@ import Library.Tactic.Addarith
 import Library.Tactic.Cancel
 import Library.Tactic.Use
 
+-- Exercise 4a
 example {n : ℤ} : 63 ∣ n ↔ 7 ∣ n ∧ 9 ∣ n := by
   constructor
   . intro h1
@@ -37,6 +38,7 @@ example {n : ℤ} : 63 ∣ n ↔ 7 ∣ n ∧ 9 ∣ n := by
       _ = 63*4*a - 63*5*a2:= by ring
       _ = 63*(4*a - 5 * a2) := by ring
 
+-- Exercise 4b
 example {k : ℕ} : k ^ 2 ≤ 6 ↔ k = 0 ∨ k = 1 ∨ k = 2 := by
   constructor
   . intro h1 
@@ -73,6 +75,8 @@ example {k : ℕ} : k ^ 2 ≤ 6 ↔ k = 0 ∨ k = 1 ∨ k = 2 := by
         _ = 4 := by ring
         _ ≤ 6 := by aesop
 
+
+-- Exercise 5a
 example : ∃! x : ℚ, ∀ a, a ≥ 1 → a ≤ 3 → (a - x) ^ 2 ≤ 1 := by
   use 2
   dsimp
@@ -110,6 +114,8 @@ example : ∃! x : ℚ, ∀ a, a ≥ 1 → a ≤ 3 → (a - x) ^ 2 ≤ 1 := by
     cancel 2 at h5
     addarith[h5]
 
+
+-- Exercise 5b
 example : ∃! x : ℚ, 4 * x - 3 = 9 := by
   use 3
   dsimp
@@ -120,6 +126,7 @@ example : ∃! x : ℚ, 4 * x - 3 = 9 := by
     have h1 : 4*y = 4*3 := by addarith[hy] 
     cancel 4 at h1   
 
+-- Exercise 5c
 example : ∃! n : ℕ, ∀ a, n ≤ a := by
   use 0
   dsimp
@@ -134,6 +141,7 @@ example : ∃! n : ℕ, ∀ a, n ≤ a := by
       simp at hy
       apply hy
       
+-- Exercise 6a
 example {p : ℕ} (hp : 2 ≤ p) (H : ∀ m : ℕ, 1 < m → m < p → ¬m ∣ p) : Prime p := by
   constructor
   · apply hp -- show that `2 ≤ p`
@@ -152,6 +160,7 @@ example {p : ℕ} (hp : 2 ≤ p) (H : ∀ m : ℕ, 1 < m → m < p → ¬m ∣ p
     . have h3 := H m hm_left h1
       contradiction 
     
+-- Exercise 6b
 example {a b c : ℕ} (ha : 0 < a) (hb : 0 < b) (hc : 0 < c)
     (h_pyth : a ^ 2 + b ^ 2 = c ^ 2) : 3 ≤ a := by
   obtain h | h := Nat.lt_or_ge a 3
@@ -212,10 +221,12 @@ example {a b c : ℕ} (ha : 0 < a) (hb : 0 < b) (hc : 0 < c)
       contradiction
   . apply h
 
+-- Exercise 6c
 example {x y : ℝ} (n : ℕ) (hx : 0 ≤ x) (hn : 0 < n) (h : y ^ n ≤ x ^ n) :
     y ≤ x := by
   cancel n at h
 
+-- Exercise 6d
 example (p : ℕ) (h : Prime p) : p = 2 ∨ Odd p := by
   obtain ⟨ h1,h2 ⟩ := h
   obtain h3 | h3 := lt_or_eq_of_le h1
